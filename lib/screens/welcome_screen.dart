@@ -1,15 +1,44 @@
+import 'package:flash_chat/screens/registration_screen.dart';
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
+import 'login_screen.dart';
+import 'new_card.dart';
 
 class WelcomeScreen extends StatefulWidget {
+  static String id = 'welcome';
+
   @override
   _WelcomeScreenState createState() => _WelcomeScreenState();
 }
 
-class _WelcomeScreenState extends State<WelcomeScreen> {
+class _WelcomeScreenState extends State<WelcomeScreen>
+    with SingleTickerProviderStateMixin {
+  AnimationController control;
+  Animation curve;
+  Animation colors;
+
+  @override
+  void initState() {
+    super.initState();
+    control = AnimationController(
+      duration: Duration(seconds: 1),
+      vsync: this,
+    );
+    curve = CurvedAnimation(parent: control, curve: Curves.decelerate);
+    colors =
+        ColorTween(begin: Colors.black45, end: Colors.white).animate(control);
+    control.forward();
+
+    control.addListener(() {
+      setState(() {});
+      print(curve.value);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: colors.value,
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
@@ -18,13 +47,19 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           children: <Widget>[
             Row(
               children: <Widget>[
-                Container(
-                  child: Image.asset('images/logo.png'),
-                  height: 60.0,
+                Hero(
+                  tag: 'transition1',
+                  child: Container(
+                    child: Image.asset('images/logo.png'),
+                    height: curve.value * 50,
+                  ),
                 ),
-                Text(
-                  'Flash Chat',
-                  style: TextStyle(
+                FadeAnimatedTextKit(
+                  text: ['Flash', 'Flash Chat'],
+                  repeatForever: true,
+                  isRepeatingAnimation: true,
+                  duration: Duration(milliseconds: 2000),
+                  textStyle: TextStyle(
                     fontSize: 45.0,
                     fontWeight: FontWeight.w900,
                   ),
@@ -34,41 +69,19 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             SizedBox(
               height: 48.0,
             ),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 16.0),
-              child: Material(
-                elevation: 5.0,
-                color: Colors.lightBlueAccent,
-                borderRadius: BorderRadius.circular(30.0),
-                child: MaterialButton(
-                  onPressed: () {
-                    //Go to login screen.
-                  },
-                  minWidth: 200.0,
-                  height: 42.0,
-                  child: Text(
-                    'Log In',
-                  ),
-                ),
-              ),
+            NewCard(
+              colour: Colors.lightBlueAccent,
+              word: 'Log In',
+              onpressed: () {
+                Navigator.pushNamed(context, LoginScreen.id);
+              },
             ),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 16.0),
-              child: Material(
-                color: Colors.blueAccent,
-                borderRadius: BorderRadius.circular(30.0),
-                elevation: 5.0,
-                child: MaterialButton(
-                  onPressed: () {
-                    //Go to registration screen.
-                  },
-                  minWidth: 200.0,
-                  height: 42.0,
-                  child: Text(
-                    'Register',
-                  ),
-                ),
-              ),
+            NewCard(
+              colour: Colors.blueAccent,
+              word: 'Registration',
+              onpressed: () {
+                Navigator.pushNamed(context, RegistrationScreen.id);
+              },
             ),
           ],
         ),
